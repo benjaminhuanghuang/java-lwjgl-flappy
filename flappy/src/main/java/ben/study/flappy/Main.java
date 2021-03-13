@@ -4,34 +4,41 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.system.MemoryUtil.*;
-
-import java.nio.ByteBuffer;
 
 import org.lwjgl.glfw.GLFWVidMode;
 
 import ben.study.flappy.graphics.Shader;
-import ben.study.flappy.Input;
 import ben.study.flappy.layer.Level;
 import ben.study.flappy.maths.Matrix4f;
+import org.lwjgl.opengl.GL;
 
-public class Main implements Runnable {
+public class Main {
     private int width = 1280;
     private int height = 720;
 
-    private Thread thread;
     private boolean running = false;
 
-    private long window;
+    private long glfwWindow;
 
     private Level level;
 
     public void start() {
         running = true;
-        thread = new Thread(this, "Game");
-        thread.start();
+        init();
+        loop();
+    }
+
+    public void loop() {
+        while (running) {
+            update();
+            render();
+            if (glfwWindowShouldClose(glfwWindow))
+                running = false;
+        }
+
+        glfwDestroyWindow(glfwWindow);
+        glfwTerminate();
     }
 
     private void init() {
@@ -41,8 +48,8 @@ public class Main implements Runnable {
         }
 
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-        window = glfwCreateWindow(width, height, "Flappy", NULL, NULL);
-        if (window == NULL) {
+        glfwWindow = glfwCreateWindow(width, height, "Flappy", NULL, NULL);
+        if (glfwWindow == NULL) {
             System.err.println("Could not create GLFW window!");
             return;
         }
@@ -50,16 +57,25 @@ public class Main implements Runnable {
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
         glfwSetWindowPos(
-                window,
+                glfwWindow,
                 (vidmode.width() - width) / 2,
                 (vidmode.height() - height) / 2
         );
 
-        glfwSetKeyCallback(window, new Input());
+        glfwSetKeyCallback(glfwWindow, new Input());
 
-        //
-        glfwMakeContextCurrent(window);
-        glfwShowWindow(window);
+        // Make the OpenGL context current
+        glfwMakeContextCurrent(glfwWindow);
+        // Enable v-sync
+        glfwSwapInterval(1);
+
+        glfwShowWindow(glfwWindow);
+        // This line is critical for LWJGL's interoperation with GLFW's
+        // OpenGL context, or any context that is managed externally.
+        // LWJGL detects the context that is current in the current thread,
+        // creates the GLCapabilities instance and makes the OpenGL
+        // bindings available for use.
+        GL.createCapabilities();
 
         glEnable(GL_DEPTH_TEST);
         glActiveTexture(GL_TEXTURE1);
@@ -108,11 +124,11 @@ public class Main implements Runnable {
                 updates = 0;
                 frames = 0;
             }
-            if (glfwWindowShouldClose(window))
+            if (glfwWindowShouldClose(glfwWindow))
                 running = false;
         }
 
-        glfwDestroyWindow(window);
+        glfwDestroyWindow(glfwWindow);
         glfwTerminate();
     }
 
@@ -132,7 +148,7 @@ public class Main implements Runnable {
         if (error != GL_NO_ERROR)
             System.out.println(error);
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(glfwWindow);
     }
 
     public static void main(String[] args) {

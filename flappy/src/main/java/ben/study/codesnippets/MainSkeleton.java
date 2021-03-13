@@ -2,7 +2,7 @@
 
 package ben.study.codesnippets;
 
-import ben.study.flappy.Main;
+import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
@@ -10,14 +10,11 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-import static org.lwjgl.opengl.GL13.*;
 
-
-public class MainSkeleton implements Runnable {
+public class MainSkeleton {
     private int width = 1280;
     private int height = 720;
 
-    private Thread thread;
     private boolean running = false;
 
     private long glfwWindow;
@@ -25,17 +22,25 @@ public class MainSkeleton implements Runnable {
 
     public void start() {
         running = true;
-        thread = new Thread(this, "Game");
-        thread.start();
+        init();
+        loop();
     }
 
     private void init() {
+        // Setup an error callback
+        GLFWErrorCallback.createPrint(System.err).set();
+
         if (!glfwInit()) {
             System.err.println("Could not initialize GLFW!");
             return;
         }
 
-        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        // Configure GLFW
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
         glfwWindow = glfwCreateWindow(width, height, "Flappy", NULL, NULL);
         if (glfwWindow == NULL) {
             System.err.println("Could not create GLFW window!");
@@ -63,16 +68,15 @@ public class MainSkeleton implements Runnable {
         // bindings available for use.
         GL.createCapabilities();
 
-        glEnable(GL_DEPTH_TEST);
-        glActiveTexture(GL_TEXTURE1);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        System.out.println("OpenGL: " + glGetString(GL_VERSION));
+//        glEnable(GL_DEPTH_TEST);
+//        glActiveTexture(GL_TEXTURE1);
+//        glEnable(GL_BLEND);
+//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//        System.out.println("OpenGL: " + glGetString(GL_VERSION));
 
     }
 
-    public void run() {
-        init();
+    public void loop() {
         while (running) {
             update();
             render();
@@ -100,7 +104,7 @@ public class MainSkeleton implements Runnable {
     }
 
     public static void main(String[] args) {
-        new Main().start();
+        new MainSkeleton().start();
     }
 
 }

@@ -16,6 +16,7 @@ public class ShaderUtils {
 
     public static int create(String vert, String frag) {
         int program = glCreateProgram();
+
         int vertID = glCreateShader(GL_VERTEX_SHADER);
         int fragID = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(vertID, vert);
@@ -45,5 +46,4 @@ public class ShaderUtils {
 
         return program;
     }
-
 }

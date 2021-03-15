@@ -27,6 +27,16 @@ public class Matrix4f {
         return result;
     }
 
+    /**
+     * Set the orthographic projection matrix.
+     * @param left The coordinate of the left of clipping plane.
+     * @param right The coordinate of the right of clipping plane.
+     * @param bottom The coordinate of the bottom of clipping plane.
+     * @param top The coordinate of the top top clipping plane.
+     * @param near The distances to the nearer depth clipping plane. This value is minus if the plane is to be behind the viewer.
+     * @param far The distances to the farther depth clipping plane. This value is minus if the plane is to be behind the viewer.
+     * @return this
+     */
     public static Matrix4f orthographic(float left, float right, float bottom, float top, float near, float far) {
         Matrix4f result = identity();
 

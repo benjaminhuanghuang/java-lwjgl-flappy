@@ -27,5 +27,4 @@ public class BufferUtils {
         result.put(array).flip();
         return result;
     }
-
 }

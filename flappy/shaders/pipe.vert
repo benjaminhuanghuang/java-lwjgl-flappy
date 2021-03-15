@@ -15,7 +15,7 @@ out DATA
 
 void main()
 {
-	gl_Position = pr_matrix * vw_matrix * ml_matrix * position;
 	vs_out.tc = tc;
 	vs_out.position = vec3(vw_matrix * ml_matrix * position);
+	gl_Position = pr_matrix * vw_matrix * ml_matrix * position;
 }
